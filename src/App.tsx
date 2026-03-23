@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play, RotateCcw, CheckCircle2, User, Coins, Download, Copy, Check, Loader2 } from 'lucide-react';
+import { Play, RotateCcw, CheckCircle2, User, Coins, Download, Copy, Check, Loader2, MapPin, Layers } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
 // --- Audio Effect ---
@@ -56,7 +56,12 @@ const ScenarioVisualizer = ({ scenario, actionType }: { scenario: any, actionTyp
         <span className="text-slate-400 text-xs mb-3 font-medium tracking-widest uppercase">你的手牌</span>
         <motion.div 
           className="flex gap-2"
-          animate={actionType === 'fold' ? { y: 150, opacity: 0, rotate: -15, scale: 0.8 } : { y: 0, opacity: 1, rotate: 0, scale: 1 }}
+          animate={
+            actionType === 'fold' ? { y: 150, opacity: 0, rotate: -15, scale: 0.8 } : 
+            actionType === 'raise' ? { y: -20, scale: 1.1 } :
+            actionType === 'call' ? { y: -10, scale: 1.05 } :
+            { y: 0, opacity: 1, rotate: 0, scale: 1 }
+          }
           transition={{ duration: 0.5, ease: "easeInOut" }}
         >
           {scenario.hand.map((c: any, i: number) => <PlayingCard key={i} r={c.r} s={c.s} />)}
@@ -120,6 +125,33 @@ const ScenarioVisualizer = ({ scenario, actionType }: { scenario: any, actionTyp
             </div>
           </motion.div>
         )}
+        {actionType === 'raise' && (
+          <motion.div 
+            initial={{ scale: 0.5, opacity: 0, y: 50 }}
+            animate={{ scale: 1.2, opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 1.5 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+          >
+            <div className="flex items-center gap-3 bg-slate-900/90 px-8 py-4 rounded-full border-2 border-red-500/50 shadow-[0_0_40px_rgba(239,68,68,0.4)]">
+              <Coins className="w-8 h-8 text-red-400" />
+              <span className="font-bold text-red-400 text-2xl tracking-wider">↑ RAISE</span>
+            </div>
+          </motion.div>
+        )}
+        {actionType === 'fold' && (
+          <motion.div 
+            initial={{ scale: 0.5, opacity: 0, y: -50 }}
+            animate={{ scale: 1.2, opacity: 1, y: 0 }}
+            exit={{ opacity: 0, scale: 1.5 }}
+            transition={{ duration: 0.4, ease: "easeOut" }}
+            className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+          >
+            <div className="flex items-center gap-3 bg-slate-900/90 px-8 py-4 rounded-full border-2 border-slate-500/50 shadow-[0_0_40px_rgba(100,116,139,0.4)]">
+              <span className="font-bold text-slate-400 text-2xl tracking-wider">✕ FOLD</span>
+            </div>
+          </motion.div>
+        )}
       </AnimatePresence>
     </div>
   );
@@ -129,7 +161,8 @@ const ScenarioVisualizer = ({ scenario, actionType }: { scenario: any, actionTyp
 const questions = [
   {
     id: 1,
-    question: "刚坐下还没摸清对手，你拿到 K♦ 10♥ 这种中等偏上的牌，通常会？",
+    question: "刚坐下还没摸清对手，你拿到 K♢10♡ (K10 杂色)，你会？",
+    proDetails: { pot: 15, position: "UTG (枪口位)", stack: "100BB" },
     options: [
       { text: "A. 稳健起见，直接弃牌。", v: -2, a: 0, s: 0 },
       { text: "B. 加注进入，拿回主动权。", v: 0, a: 2, s: 0 },
@@ -139,14 +172,25 @@ const questions = [
   {
     id: 2,
     question: "前面有 3 个人平跟（Limp）进池，你在大盲位拿着 5♠ 7♠（小同花连牌），你会？",
+    proDetails: { pot: 45, position: "BB (大盲位)", stack: "100BB" },
     options: [
       { text: "A. 难得进场便宜，肯定看看翻牌。", v: 2, a: -1, s: 0 },
-      { text: "B. 牌太烂，哪怕免费看牌也不想玩，直接过牌。", v: -2, a: 0, s: 0 }
-    ]
+      { text: "B. 牌太烂，哪怕免费看牌也不想玩，直接弃牌。", v: -2, a: 0, s: 0 }
+    ],
+    proVersion: {
+      question: "前面 3 人平跟（Limp），你在大盲位（BB）持 5♠7♠。",
+      proDetails: { pot: 45, position: "BB (大盲位)", stack: "100BB" },
+      options: [
+        { text: "A. 既然免费，直接过牌看翻牌，不中就放弃（Check-Fold）。", v: 1, a: -2, s: 0 },
+        { text: "B. 拒绝平庸，哪怕免费也不想在差位置纠缠，直接过牌后“一枪不接”。", v: -2, a: 0, s: 0 },
+        { text: "C. 尝试 Open 挤压（Squeeze）：大尺度加注到 6BB+，直接收池。", v: 1, a: 3, s: 0 }
+      ]
+    }
   },
   {
     id: 3,
     question: "你在翻牌中了顶对，但对手先下注了，你的第一反应是？",
+    proDetails: { pot: 100, position: "BTN (庄位)", stack: "80BB" },
     scenario: {
       hand: [{r:'A',s:'♠'}, {r:'Q',s:'♥'}],
       board: [{r:'Q',s:'♦'}, {r:'7',s:'♣'}, {r:'2',s:'♠'}],
@@ -157,11 +201,28 @@ const questions = [
     options: [
       { text: "A. 马上加注（Raise），告诉他我也有牌。", v: 0, a: 2, s: 0 },
       { text: "B. 先跟注（Call）看看，怕他有更大的。", v: 0, a: -2, s: 1 }
-    ]
+    ],
+    proVersion: {
+      question: "底池 100，你翻前加注，对手领先下注（Lead Bet）60。",
+      proDetails: { pot: 100, position: "BTN (庄位)", stack: "80BB" },
+      scenario: {
+        hand: [{r:'A',s:'♠'}, {r:'Q',s:'♥'}],
+        board: [{r:'Q',s:'♦'}, {r:'7',s:'♣'}, {r:'2',s:'♠'}],
+        pot: 100,
+        invested: 40,
+        oppAction: "下注 60"
+      },
+      options: [
+        { text: "A. 马上加注（Raise）：牌面很干，直接反击拿价值并保护手牌。", v: 0, a: 2, s: 0 },
+        { text: "B. 只是跟注（Call）：我的牌已经很大且没有听牌威胁，留出空间让对手继续诈唬。", v: 0, a: 1, s: 1 },
+        { text: "C. 弃牌：对方下注 60% 底池很凶，怕他有 Q7 或三条。", v: 0, a: -2, s: -1 }
+      ]
+    }
   },
   {
     id: 4,
     question: "翻牌出来你什么都没中，对手下了一个底池 1/3 的小注，你会？",
+    proDetails: { pot: 120, position: "CO (关位)", stack: "120BB" },
     scenario: {
       hand: [{r:'K',s:'♠'}, {r:'J',s:'♠'}],
       board: [{r:'7',s:'♣'}, {r:'4',s:'♦'}, {r:'2',s:'♥'}],
@@ -172,11 +233,28 @@ const questions = [
     options: [
       { text: "A. 既然没中，直接弃牌，不浪费筹码。", v: 0, a: 0, s: -2 },
       { text: "B. 稍微有点后门听牌的机会，我就想跟注看看。", v: 0, a: -1, s: 2 }
-    ]
+    ],
+    proVersion: {
+      question: "底池 120，你没中，对手下注 35（约 1/3 底池）。",
+      proDetails: { pot: 120, position: "CO (关位)", stack: "120BB" },
+      scenario: {
+        hand: [{r:'K',s:'♠'}, {r:'J',s:'♠'}],
+        board: [{r:'7',s:'♣'}, {r:'4',s:'♦'}, {r:'2',s:'♥'}],
+        pot: 120,
+        invested: 40,
+        oppAction: "下注 35"
+      },
+      options: [
+        { text: "A. 既然没中就弃牌：哪怕只有 35，没有胜率的跟注也是浪费。", v: 0, a: 0, s: -2 },
+        { text: "B. 赔率太诱人：花 35 买后面两张牌，万一中了呢？", v: 0, a: -1, s: 2 },
+        { text: "C. 尝试反拉（Raise）：利用对手下注轻的弱点，直接诈唬。", v: 0, a: 3, s: 0 }
+      ]
+    }
   },
   {
     id: 5,
-    question: "【灵魂拷问】在桌上出现以下两个情况哪个是你更讨厌的？",
+    question: "在桌上出现以下两个情况哪个是你更讨厌的？",
+    proDetails: { pot: 0, position: "N/A", stack: "N/A" },
     options: [
       { text: "A. 说出“我fold弃牌。”（总觉得扔了之后，后面会出我要的牌，或者觉得被偷了）", v: 0, a: 0, s: 2 },
       { text: "B. 听到“我all-in全进。”（讨厌别人突然打很大，让我很难决定跟还是不跟）", v: 0, a: -2, s: -1 }
@@ -185,6 +263,7 @@ const questions = [
   {
     id: 6,
     question: "翻牌和转牌你都跟注了，底池已经不小。河牌发出来一张无关痛痒的小牌，你手里依然只是个底对。这时对方突然发起重注攻击（Pot Size Bet），你的第一反应是？",
+    proDetails: { pot: 400, position: "SB (小盲位)", stack: "50BB" },
     scenario: {
       hand: [{r:'A',s:'♦'}, {r:'2',s:'♦'}],
       board: [{r:'J',s:'♥'}, {r:'9',s:'♠'}, {r:'8',s:'♣'}, {r:'4',s:'♦'}, {r:'2',s:'♣'}],
@@ -200,6 +279,7 @@ const questions = [
   {
     id: 7,
     question: "在长达一小时的牌局中，你发现自己弃牌的次数？",
+    proDetails: { pot: 0, position: "N/A", stack: "N/A" },
     options: [
       { text: "A. 非常多，我只玩我觉得稳赢的。", v: -2, a: 0, s: -1 },
       { text: "B. 很少，我喜欢参与其中的感觉。", v: 2, a: -1, s: 1 },
@@ -209,6 +289,7 @@ const questions = [
   {
     id: 8,
     question: "你手持 A♣ K♦，翻牌是 7♠ 2♥ 9♣。你没中，对手突然推了全进，你会？",
+    proDetails: { pot: 150, position: "MP (中位)", stack: "150BB" },
     scenario: {
       hand: [{r:'A',s:'♣'}, {r:'K',s:'♦'}],
       board: [{r:'7',s:'♠'}, {r:'2',s:'♥'}, {r:'9',s:'♣'}],
@@ -219,11 +300,28 @@ const questions = [
     options: [
       { text: "A. 秒弃，没中就没道理跟。", v: 0, a: 0, s: -2 },
       { text: "B. 我有 AK，这是大牌，我要搏一张 A 或 K。", v: 0, a: -1, s: 2 }
-    ]
+    ],
+    proVersion: {
+      question: "底池 150，对方突然超额全进 800。",
+      proDetails: { pot: 150, position: "MP (中位)", stack: "150BB" },
+      scenario: {
+        hand: [{r:'A',s:'♣'}, {r:'K',s:'♦'}],
+        board: [{r:'7',s:'♠'}, {r:'2',s:'♥'}, {r:'9',s:'♣'}],
+        pot: 150,
+        invested: 60,
+        oppAction: "全进 (All-in) 800"
+      },
+      options: [
+        { text: "A. 看赔率：如果对手推的尺度合理（如平池），我会接；推 5 倍底池必弃。", v: 0, a: 0, s: -1 },
+        { text: "B. 不管赔率：我有 AK 这种顶级大牌，一定要搏一张 A 或 K 出来。", v: 1, a: 0, s: 3 },
+        { text: "C. 机械弃牌：没中对子就不接全进，哪怕对手可能在诈唬。", v: -1, a: -1, s: -2 }
+      ]
+    }
   },
   {
     id: 9,
     question: "如果你连续输了三手牌，你接下来的打法是？",
+    proDetails: { pot: 0, position: "N/A", stack: "N/A" },
     options: [
       { text: "A. 变得更紧，找机会回血。", v: -2, a: 0, s: 0 },
       { text: "B. 变得更松，什么牌都想进去“报仇”。", v: 2, a: 2, s: 0 }
@@ -232,6 +330,7 @@ const questions = [
   {
     id: 10,
     question: "当你加注后被对手再加注（3-bet），你通常会？",
+    proDetails: { pot: 180, position: "UTG+1", stack: "200BB" },
     scenario: {
       hand: [{r:'8',s:'♣'}, {r:'8',s:'♦'}],
       board: [],
@@ -243,7 +342,24 @@ const questions = [
     options: [
       { text: "A. 既然已经投入了筹码，就一定要看看翻牌。", v: 1, a: -1, s: 2 },
       { text: "B. 如果手里的牌不是顶级的，就果断弃牌。", v: -1, a: 0, s: -2 }
-    ]
+    ],
+    proVersion: {
+      question: "你加注到 40，稳健对手 3-bet 你到 140。",
+      proDetails: { pot: 180, position: "UTG+1", stack: "200BB" },
+      scenario: {
+        hand: [{r:'8',s:'♣'}, {r:'8',s:'♦'}],
+        board: [],
+        pot: 180,
+        invested: 40,
+        oppAction: "再加注到 140",
+        note: "对手是一个很稳的玩家，他突然对你 3-bet"
+      },
+      options: [
+        { text: "A. 看筹码深度：如果后手还有 2000+，我会跟注博 1/12 的中三条机会。", v: 1, a: 0, s: 1 },
+        { text: "B. 看赔率：对方后手所剩无几（如只剩 300），博三条不划算，直接弃牌。", v: -2, a: 0, s: -1 },
+        { text: "C. 已经投了 40，不想白白损失，硬着头皮也要再跟 100 看看。", v: 2, a: -1, s: 2 }
+      ]
+    }
   }
 ];
 
@@ -302,7 +418,8 @@ export default function App() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [scores, setScores] = useState({ v: 0, a: 0, s: 0 });
   const [finished, setFinished] = useState(false);
-  const [actionAnim, setActionAnim] = useState<'fold' | 'call' | null>(null);
+  const [actionAnim, setActionAnim] = useState<'fold' | 'call' | 'raise' | null>(null);
+  const [proMode, setProMode] = useState(true);
 
   const resultRef = useRef<HTMLDivElement>(null);
   const [isCopied, setIsCopied] = useState(false);
@@ -355,12 +472,15 @@ export default function App() {
     if (actionAnim) return; // Prevent double clicks during animation
 
     const text = option.text;
-    let type: 'fold' | 'call' | null = null;
+    let type: 'fold' | 'call' | 'raise' | null = null;
     
     // Determine animation type based on option text
-    if (text.includes('弃牌') || text.includes('秒弃') || text.includes('过牌')) {
+    if (text.includes('弃牌') || text.includes('秒弃') || text.includes('过牌') || text.includes('放弃') || text.includes('一枪不接')) {
       type = 'fold';
-    } else if (text.includes('跟注') || text.includes('加注') || text.includes('全进') || text.includes('抓他') || text.includes('Limp') || text.includes('看看翻牌') || text.includes('搏一张')) {
+    } else if (text.includes('加注') || text.includes('反拉') || text.includes('Squeeze') || text.includes('全进')) {
+      type = 'raise';
+      playChipSound();
+    } else if (text.includes('跟注') || text.includes('抓他') || text.includes('Limp') || text.includes('看看翻牌') || text.includes('搏一张') || text.includes('接')) {
       type = 'call';
       playChipSound();
     }
@@ -384,7 +504,11 @@ export default function App() {
     }, type ? 700 : 0); // 700ms delay if there's an animation, otherwise instant
   };
 
-  const currentQuestion = questions[currentIndex];
+  const baseQuestion = questions[currentIndex];
+  // If pro mode is on and there's a pro version, merge it in
+  const currentQuestion = proMode && (baseQuestion as any).proVersion 
+    ? { ...baseQuestion, ...(baseQuestion as any).proVersion } 
+    : baseQuestion;
   const progress = ((currentIndex) / questions.length) * 100;
 
   return (
@@ -395,6 +519,15 @@ export default function App() {
             ♠
           </div>
           德扑玩家类型测试
+        </div>
+        <div className="flex items-center gap-3">
+          <span className="text-sm font-medium text-slate-500">简单模式</span>
+          <button
+            onClick={() => setProMode(!proMode)}
+            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${!proMode ? 'bg-indigo-600' : 'bg-slate-300'}`}
+          >
+            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${!proMode ? 'translate-x-6' : 'translate-x-1'}`} />
+          </button>
         </div>
       </header>
 
@@ -414,6 +547,9 @@ export default function App() {
               <p className="text-slate-500 mb-8 text-lg leading-relaxed max-w-xl mx-auto">
                 只需 10 道题，基于 VPIP（入池率）、Aggression（激进程度）和 Stickiness（粘性）三个维度，精准测出你的牌桌风格。
               </p>
+              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8 max-w-md mx-auto text-sm text-slate-600 text-left">
+                <span className="font-semibold text-slate-700">💡 提示：</span>默认专业模式题目包含“底池数据”、“位置标注”和“筹码深度”。如需更直观的体验，可在右上角开启“简单模式”。
+              </div>
               <button
                 onClick={handleStart}
                 className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-full font-medium text-lg transition-all shadow-sm hover:shadow-md active:scale-95"
@@ -447,7 +583,24 @@ export default function App() {
               </div>
 
               <div className="bg-white rounded-3xl shadow-sm border border-slate-100 p-5 sm:p-8 md:p-10">
-                <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-8 leading-snug">
+                {proMode && currentQuestion.proDetails && currentQuestion.proDetails.pot !== 0 && (
+                  <div className="flex flex-wrap gap-3 mb-6">
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
+                      <div className="w-4 h-4 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-600 text-xs">💰</div>
+                      底池: {currentQuestion.proDetails.pot}
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
+                      <MapPin className="w-4 h-4 text-emerald-600" />
+                      {currentQuestion.proDetails.position}
+                    </div>
+                    <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
+                      <Layers className="w-4 h-4 text-amber-600" />
+                      深度: {currentQuestion.proDetails.stack}
+                    </div>
+                  </div>
+                )}
+                
+                <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-6 leading-snug">
                   {currentQuestion.question}
                 </h2>
                 

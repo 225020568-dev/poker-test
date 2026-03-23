@@ -162,35 +162,35 @@ const questions = [
   {
     id: 1,
     question: "刚坐下还没摸清对手，你拿到 K♢10♡ (K10 杂色)，你会？",
-    proDetails: { pot: 15, position: "UTG (枪口位)", stack: "100BB" },
+    proDetails: { pot: 15, position: "UTG (枪口位)", stack: "1000" },
     options: [
       { text: "A. 稳健起见，直接弃牌。", v: -2, a: 0, s: 0 },
-      { text: "B. 加注进入，拿回主动权。", v: 0, a: 2, s: 0 },
+      { text: "B. 加注进入，拿下主动权。", v: 0, a: 2, s: 0 },
       { text: "C. 跟着前面的平跟玩家一起 Limp 进去看牌。", v: 2, a: -1, s: 0 }
     ]
   },
   {
     id: 2,
     question: "前面有 3 个人平跟（Limp）进池，你在大盲位拿着 5♠ 7♠（小同花连牌），你会？",
-    proDetails: { pot: 45, position: "BB (大盲位)", stack: "100BB" },
+    proDetails: { pot: 45, position: "BB (大盲位)", stack: "1000" },
     options: [
       { text: "A. 难得进场便宜，肯定看看翻牌。", v: 2, a: -1, s: 0 },
       { text: "B. 牌太烂，哪怕免费看牌也不想玩，直接弃牌。", v: -2, a: 0, s: 0 }
     ],
     proVersion: {
       question: "前面 3 人平跟（Limp），你在大盲位（BB）持 5♠7♠。",
-      proDetails: { pot: 45, position: "BB (大盲位)", stack: "100BB" },
+      proDetails: { pot: 45, position: "BB (大盲位)", stack: "1000" },
       options: [
         { text: "A. 既然免费，直接过牌看翻牌，不中就放弃（Check-Fold）。", v: 1, a: -2, s: 0 },
         { text: "B. 拒绝平庸，哪怕免费也不想在差位置纠缠，直接过牌后“一枪不接”。", v: -2, a: 0, s: 0 },
-        { text: "C. 尝试 Open 挤压（Squeeze）：大尺度加注到 6BB+，直接收池。", v: 1, a: 3, s: 0 }
+        { text: "C. 尝试 Open 挤压（Squeeze）：大尺度加注到 60+，直接收池。", v: 1, a: 3, s: 0 }
       ]
     }
   },
   {
     id: 3,
     question: "你在翻牌中了顶对，但对手先下注了，你的第一反应是？",
-    proDetails: { pot: 100, position: "BTN (庄位)", stack: "80BB" },
+    proDetails: { pot: 100, position: "BTN (庄位)", stack: "800" },
     scenario: {
       hand: [{r:'A',s:'♠'}, {r:'Q',s:'♥'}],
       board: [{r:'Q',s:'♦'}, {r:'7',s:'♣'}, {r:'2',s:'♠'}],
@@ -204,7 +204,7 @@ const questions = [
     ],
     proVersion: {
       question: "底池 100，你翻前加注，对手领先下注（Lead Bet）60。",
-      proDetails: { pot: 100, position: "BTN (庄位)", stack: "80BB" },
+      proDetails: { pot: 100, position: "BTN (庄位)", stack: "800" },
       scenario: {
         hand: [{r:'A',s:'♠'}, {r:'Q',s:'♥'}],
         board: [{r:'Q',s:'♦'}, {r:'7',s:'♣'}, {r:'2',s:'♠'}],
@@ -221,8 +221,8 @@ const questions = [
   },
   {
     id: 4,
-    question: "翻牌出来你什么都没中，对手下了一个底池 1/3 的小注，你会？",
-    proDetails: { pot: 120, position: "CO (关位)", stack: "120BB" },
+    question: "你手持 K♠ J♠（翻前加注，只有 2 个高张），翻牌 7♣ 4♦ 2♥。你没中，对手下注底池的 1/3。",
+    proDetails: { pot: 120, position: "CO (关位)", stack: "1200" },
     scenario: {
       hand: [{r:'K',s:'♠'}, {r:'J',s:'♠'}],
       board: [{r:'7',s:'♣'}, {r:'4',s:'♦'}, {r:'2',s:'♥'}],
@@ -231,49 +231,48 @@ const questions = [
       oppAction: "下注 35"
     },
     options: [
-      { text: "A. 既然没中，直接弃牌，不浪费筹码。", v: 0, a: 0, s: -2 },
-      { text: "B. 稍微有点后门听牌的机会，我就想跟注看看。", v: 0, a: -1, s: 2 }
-    ],
-    proVersion: {
-      question: "底池 120，你没中，对手下注 35（约 1/3 底池）。",
-      proDetails: { pot: 120, position: "CO (关位)", stack: "120BB" },
-      scenario: {
-        hand: [{r:'K',s:'♠'}, {r:'J',s:'♠'}],
-        board: [{r:'7',s:'♣'}, {r:'4',s:'♦'}, {r:'2',s:'♥'}],
-        pot: 120,
-        invested: 40,
-        oppAction: "下注 35"
-      },
-      options: [
-        { text: "A. 既然没中就弃牌：哪怕只有 35，没有胜率的跟注也是浪费。", v: 0, a: 0, s: -2 },
-        { text: "B. 赔率太诱人：花 35 买后面两张牌，万一中了呢？", v: 0, a: -1, s: 2 },
-        { text: "C. 尝试反拉（Raise）：利用对手下注轻的弱点，直接诈唬。", v: 0, a: 3, s: 0 }
-      ]
-    }
+      { text: "A. 弃牌。没中就没胜率，没必要在干燥牌面浪费 1/3 的筹码。", v: 0, a: 0, s: -2 },
+      { text: "B. 浮动跟注 (Float)：利用赔率跟一注，打算在转牌对手示弱时通过位置优势偷下底池。", v: 0, a: 2, s: 1 },
+      { text: "C. 便宜跟注：反正注很小，万一转牌发个 K 或者 J我就反超了。", v: 0, a: -1, s: 2 }
+    ]
   },
   {
     id: 5,
-    question: "在桌上出现以下两个情况哪个是你更讨厌的？",
+    question: "长期游戏后，你发现哪种局面最让你感到挫败？",
     proDetails: { pot: 0, position: "N/A", stack: "N/A" },
     options: [
-      { text: "A. 说出“我fold弃牌。”（总觉得扔了之后，后面会出我要的牌，或者觉得被偷了）", v: 0, a: 0, s: 2 },
-      { text: "B. 听到“我all-in全进。”（讨厌别人突然打很大，让我很难决定跟还是不跟）", v: 0, a: -2, s: -1 }
+      { text: "A. 弃牌（Fold）：每次弃牌都觉得可能错过了一个大底池，或者觉得自己被偷了。", v: 0, a: 0, s: 2 },
+      { text: "B. 面对重压（Pressure）：对手频繁的全进或超大注，让你感到决策非常痛苦。", v: 0, a: -2, s: 0 },
+      { text: "C. 枯燥无味（Idle）：大家都很稳，底池都很小，没有人搞事。", v: 1, a: 2, s: 0 }
     ]
   },
   {
     id: 6,
-    question: "翻牌和转牌你都跟注了，底池已经不小。河牌发出来一张无关痛痒的小牌，你手里依然只是个底对。这时对方突然发起重注攻击（Pot Size Bet），你的第一反应是？",
-    proDetails: { pot: 400, position: "SB (小盲位)", stack: "50BB" },
+    question: "手持 AJ 在 J-9-8-4-5 牌面（顶对），翻牌转牌你都跟了，河牌对手突然满池重注 400，你会？",
+    proDetails: { pot: 400, position: "SB (小盲位)", stack: "500" },
     scenario: {
-      hand: [{r:'A',s:'♦'}, {r:'2',s:'♦'}],
-      board: [{r:'J',s:'♥'}, {r:'9',s:'♠'}, {r:'8',s:'♣'}, {r:'4',s:'♦'}, {r:'2',s:'♣'}],
+      hand: [{r:'A',s:'♠'}, {r:'J',s:'♥'}],
+      board: [{r:'J',s:'♦'}, {r:'9',s:'♣'}, {r:'8',s:'♠'}, {r:'4',s:'♥'}, {r:'5',s:'♦'}],
       pot: 400,
       invested: 180,
       oppAction: "下注 400 (满池)"
     },
     options: [
-      { text: "A. “他肯定在偷！我不信，我要抓他。”", v: 0, a: -1, s: 2 },
-      { text: "B. “算了，我这牌肯定赢不了，弃牌。”", v: 0, a: 0, s: -2 }
+      { 
+        text: "A. 不信！这牌面顺子虽然多，但他很可能在偷鸡，我要抓他！", 
+        v: 0, a: 0, s: 3,
+        desc: "典型的粘性思维，不忍放弃顶对的价值"
+      },
+      { 
+        text: "B. 理智弃牌：牌面太湿了，对手的范围里全是顺子和两对。", 
+        v: 0, a: 0, s: -2,
+        desc: "优秀的风险控制，懂得在劣势时止损"
+      },
+      { 
+        text: "C. 根据对手形象：如果是疯子就接，如果是稳健选手就弃。", 
+        v: 0, a: 1, s: 0,
+        desc: "剥削型思维，决策依据于对手特征而非情绪"
+      }
     ]
   },
   {
@@ -289,7 +288,7 @@ const questions = [
   {
     id: 8,
     question: "你手持 A♣ K♦，翻牌是 7♠ 2♥ 9♣。你没中，对手突然推了全进，你会？",
-    proDetails: { pot: 150, position: "MP (中位)", stack: "150BB" },
+    proDetails: { pot: 150, position: "MP (中位)", stack: "1500" },
     scenario: {
       hand: [{r:'A',s:'♣'}, {r:'K',s:'♦'}],
       board: [{r:'7',s:'♠'}, {r:'2',s:'♥'}, {r:'9',s:'♣'}],
@@ -303,7 +302,7 @@ const questions = [
     ],
     proVersion: {
       question: "底池 150，对方突然超额全进 800。",
-      proDetails: { pot: 150, position: "MP (中位)", stack: "150BB" },
+      proDetails: { pot: 150, position: "MP (中位)", stack: "1500" },
       scenario: {
         hand: [{r:'A',s:'♣'}, {r:'K',s:'♦'}],
         board: [{r:'7',s:'♠'}, {r:'2',s:'♥'}, {r:'9',s:'♣'}],
@@ -330,7 +329,7 @@ const questions = [
   {
     id: 10,
     question: "当你加注后被对手再加注（3-bet），你通常会？",
-    proDetails: { pot: 180, position: "UTG+1", stack: "200BB" },
+    proDetails: { pot: 180, position: "UTG+1", stack: "2000" },
     scenario: {
       hand: [{r:'8',s:'♣'}, {r:'8',s:'♦'}],
       board: [],
@@ -340,12 +339,12 @@ const questions = [
       note: "对手是一个很稳的玩家，他突然对你 3-bet"
     },
     options: [
-      { text: "A. 既然已经投入了筹码，就一定要看看翻牌。", v: 1, a: -1, s: 2 },
+      { text: "A. 我会跟注博中三条机会。", v: 1, a: -1, s: 2 },
       { text: "B. 如果手里的牌不是顶级的，就果断弃牌。", v: -1, a: 0, s: -2 }
     ],
     proVersion: {
       question: "你加注到 40，稳健对手 3-bet 你到 140。",
-      proDetails: { pot: 180, position: "UTG+1", stack: "200BB" },
+      proDetails: { pot: 180, position: "UTG+1", stack: "2000" },
       scenario: {
         hand: [{r:'8',s:'♣'}, {r:'8',s:'♦'}],
         board: [],
@@ -600,7 +599,7 @@ export default function App() {
                   </div>
                 )}
                 
-                <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-6 leading-snug">
+                <h2 className="text-xl md:text-2xl font-semibold text-slate-900 mb-6 leading-snug whitespace-pre-wrap">
                   {currentQuestion.question}
                 </h2>
                 

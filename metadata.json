@@ -1,0 +1,5 @@
+{
+  "name": "德扑玩家类型测试",
+  "description": "一个10题的德州扑克玩家类型测试，基于VPIP、Aggression和Stickiness三个维度评估你的打牌风格。",
+  "requestFramePermissions": []
+}

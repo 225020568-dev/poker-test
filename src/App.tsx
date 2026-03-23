@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, RotateCcw, CheckCircle2, User, Coins, Download, Copy, Check, Loader2 } from 'lucide-react';
-import html2canvas from 'html2canvas';
+import { toPng } from 'html-to-image';
 
 // --- Audio Effect ---
 const playChipSound = () => {
@@ -33,7 +33,7 @@ const playChipSound = () => {
 };
 
 // --- Components ---
-const PlayingCard = ({ r, s }: { r: string, s: string }) => {
+const PlayingCard: React.FC<{ r: string; s: string }> = ({ r, s }) => {
   const isRed = s === '♥' || s === '♦';
   return (
     <div className="w-12 h-16 sm:w-14 sm:h-20 bg-white rounded-lg shadow-md border border-slate-200 flex flex-col items-center justify-center font-bold text-xl sm:text-2xl relative overflow-hidden">
@@ -140,8 +140,8 @@ const questions = [
     id: 2,
     question: "前面有 3 个人平跟（Limp）进池，你在大盲位拿着 5♠ 7♠（小同花连牌），你会？",
     options: [
-      { text: "A. 难得进场便宜，肯定看看翻牌。", v: 2, a: 0, s: 1 },
-      { text: "B. 牌太烂，哪怕免费看牌也不想玩，直接过牌。", v: -1, a: 0, s: 0 }
+      { text: "A. 难得进场便宜，肯定看看翻牌。", v: 2, a: -1, s: 0 },
+      { text: "B. 牌太烂，哪怕免费看牌也不想玩，直接过牌。", v: -2, a: 0, s: 0 }
     ]
   },
   {
@@ -156,7 +156,7 @@ const questions = [
     },
     options: [
       { text: "A. 马上加注（Raise），告诉他我也有牌。", v: 0, a: 2, s: 0 },
-      { text: "B. 先跟注（Call）看看，怕他有更大的。", v: 0, a: -2, s: 0 }
+      { text: "B. 先跟注（Call）看看，怕他有更大的。", v: 0, a: -2, s: 1 }
     ]
   },
   {
@@ -171,7 +171,7 @@ const questions = [
     },
     options: [
       { text: "A. 既然没中，直接弃牌，不浪费筹码。", v: 0, a: 0, s: -2 },
-      { text: "B. 稍微有点后门听牌的机会，我就想跟注看看。", v: 0, a: 0, s: 2 }
+      { text: "B. 稍微有点后门听牌的机会，我就想跟注看看。", v: 0, a: -1, s: 2 }
     ]
   },
   {
@@ -179,7 +179,7 @@ const questions = [
     question: "【灵魂拷问】在桌上出现以下两个情况哪个是你更讨厌的？",
     options: [
       { text: "A. 说出“我fold弃牌。”（总觉得扔了之后，后面会出我要的牌，或者觉得被偷了）", v: 0, a: 0, s: 2 },
-      { text: "B. 听到“我all-in全进。”（讨厌别人突然打很大，让我很难决定跟还是不跟）", v: 0, a: -2, s: 0 }
+      { text: "B. 听到“我all-in全进。”（讨厌别人突然打很大，让我很难决定跟还是不跟）", v: 0, a: -2, s: -1 }
     ]
   },
   {
@@ -193,16 +193,17 @@ const questions = [
       oppAction: "下注 400 (满池)"
     },
     options: [
-      { text: "A. “他肯定在偷！我不信，我要抓他。”", v: 0, a: 0, s: 2 },
-      { text: "B. “算了，我这牌肯定赢不了，弃牌。”", v: 0, a: 0, s: -1 }
+      { text: "A. “他肯定在偷！我不信，我要抓他。”", v: 0, a: -1, s: 2 },
+      { text: "B. “算了，我这牌肯定赢不了，弃牌。”", v: 0, a: 0, s: -2 }
     ]
   },
   {
     id: 7,
     question: "在长达一小时的牌局中，你发现自己弃牌的次数？",
     options: [
-      { text: "A. 非常多，我只玩我觉得稳赢的。", v: -2, a: 0, s: 0 },
-      { text: "B. 很少，我喜欢参与其中的感觉。", v: 2, a: 0, s: 2 }
+      { text: "A. 非常多，我只玩我觉得稳赢的。", v: -2, a: 0, s: -1 },
+      { text: "B. 很少，我喜欢参与其中的感觉。", v: 2, a: -1, s: 1 },
+      { text: "C. 中规中矩，主要看位置和对手的漏洞出手。", v: 0, a: 1, s: 0 }
     ]
   },
   {
@@ -216,15 +217,15 @@ const questions = [
       oppAction: "全进 (All-in) 800"
     },
     options: [
-      { text: "A. 秒弃，没中就没道理跟。", v: 0, a: 0, s: -1 },
-      { text: "B. 我有 AK，这是大牌，我要搏一张 A 或 K。", v: 0, a: 0, s: 3 }
+      { text: "A. 秒弃，没中就没道理跟。", v: 0, a: 0, s: -2 },
+      { text: "B. 我有 AK，这是大牌，我要搏一张 A 或 K。", v: 0, a: -1, s: 2 }
     ]
   },
   {
     id: 9,
     question: "如果你连续输了三手牌，你接下来的打法是？",
     options: [
-      { text: "A. 变得更紧，找机会回血。", v: -1, a: 0, s: 0 },
+      { text: "A. 变得更紧，找机会回血。", v: -2, a: 0, s: 0 },
       { text: "B. 变得更松，什么牌都想进去“报仇”。", v: 2, a: 2, s: 0 }
     ]
   },
@@ -240,8 +241,8 @@ const questions = [
       note: "对手是一个很稳的玩家，他突然对你 3-bet"
     },
     options: [
-      { text: "A. 既然已经投入了筹码，就一定要看看翻牌。", v: 0, a: 0, s: 2 },
-      { text: "B. 如果手里的牌不是顶级的，就果断弃牌。", v: -1, a: 0, s: -1 }
+      { text: "A. 既然已经投入了筹码，就一定要看看翻牌。", v: 1, a: -1, s: 2 },
+      { text: "B. 如果手里的牌不是顶级的，就果断弃牌。", v: -1, a: 0, s: -2 }
     ]
   }
 ];
@@ -332,15 +333,15 @@ export default function App() {
     try {
       // Add a small delay to ensure rendering is complete
       await new Promise(resolve => setTimeout(resolve, 100));
-      const canvas = await html2canvas(resultRef.current, {
-        scale: 2,
+      
+      const dataUrl = await toPng(resultRef.current, {
+        cacheBust: true,
         backgroundColor: '#f8fafc', // match slate-50
-        useCORS: true,
-        logging: false
+        pixelRatio: 2,
       });
-      const url = canvas.toDataURL('image/png');
+      
       const a = document.createElement('a');
-      a.href = url;
+      a.href = dataUrl;
       a.download = '德扑玩家测试战报.png';
       a.click();
     } catch (err) {

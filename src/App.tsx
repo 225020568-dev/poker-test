@@ -445,13 +445,15 @@ export default function App() {
     }
   };
 
-  const handleOptionClick = (option: any) => {
-    if (actionAnim) return; // Prevent double clicks during animation
+
+    
+const handleOptionClick = (option: any) => {
+    if (actionAnim) return; // 防止动画期间重复点击
 
     const text = option.text;
     let type: 'fold' | 'call' | 'raise' | null = null;
     
-    // Determine animation type based on option text
+    // 动作类型判断
     if (text.includes('弃牌') || text.includes('秒弃') || text.includes('过牌') || text.includes('放弃') || text.includes('一枪不接')) {
       type = 'fold';
     } else if (text.includes('加注') || text.includes('反拉') || text.includes('Squeeze') || text.includes('全进')) {
@@ -464,37 +466,35 @@ export default function App() {
 
     setActionAnim(type);
 
-// Wait for animation to complete before moving to next question
+    // 等待动画完成后处理数据
     setTimeout(() => {
-      // 1. 【关键修改】先手动算出最新的总分，确保包含最后一题
+      // 1. 计算最新总分
       const nextV = scores.v + option.v;
       const nextA = scores.a + option.a;
       const nextS = scores.s + option.s;
 
-      // 2. 更新 React 状态（这步是为了让网页显示正确）
       setScores({ v: nextV, a: nextA, s: nextS });
 
       if (currentIndex < questions.length - 1) {
-        // 如果不是最后一题，正常进入下一题
+        // 进入下一题
         setCurrentIndex(prev => prev + 1);
       } else {
-        // 3. 【关键修改】如果是最后一题，先算出结果，再发给 GA
+        // --- 核心埋点区：测试结束 ---
         const finalResult = getResult(nextV, nextA, nextS);
         
         if (typeof gtag === 'function') {
           gtag('event', 'test_complete', {
-            'player_type': finalResult.type, // 记录最终玩家类型
-            'v_score': nextV,                // 记录最终入池倾向分
-            'a_score': nextA,                // 记录最终激进分
-            's_score': nextS                 // 记录最终粘性分
+            'player_type': finalResult.type,
+            'v_score': nextV,
+            'a_score': nextA,
+            's_score': nextS
           });
         }
-        
-        // 4. 最后标记测试结束
         setFinished(true);
       }
       setActionAnim(null);
     }, type ? 700 : 0);
+  }; // 这里是函数结束的括号，一定要检查是否还在
 
   const baseQuestion = questions[currentIndex];
   // If pro mode is on and there's a pro version, merge it in

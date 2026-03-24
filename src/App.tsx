@@ -2,6 +2,7 @@ import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Play, RotateCcw, CheckCircle2, User, Coins, Download, Copy, Check, Loader2, MapPin, Layers, BrainCircuit, Coffee } from 'lucide-react';
 import { toPng } from 'html-to-image';
+declare var gtag: Function;
 
 // --- Audio Effect ---
 const playChipSound = () => {
@@ -463,22 +464,37 @@ export default function App() {
 
     setActionAnim(type);
 
-    // Wait for animation to complete before moving to next question
+// Wait for animation to complete before moving to next question
     setTimeout(() => {
-      setScores(prev => ({
-        v: prev.v + option.v,
-        a: prev.a + option.a,
-        s: prev.s + option.s
-      }));
+      // 1. 【关键修改】先手动算出最新的总分，确保包含最后一题
+      const nextV = scores.v + option.v;
+      const nextA = scores.a + option.a;
+      const nextS = scores.s + option.s;
+
+      // 2. 更新 React 状态（这步是为了让网页显示正确）
+      setScores({ v: nextV, a: nextA, s: nextS });
 
       if (currentIndex < questions.length - 1) {
+        // 如果不是最后一题，正常进入下一题
         setCurrentIndex(prev => prev + 1);
       } else {
+        // 3. 【关键修改】如果是最后一题，先算出结果，再发给 GA
+        const finalResult = getResult(nextV, nextA, nextS);
+        
+        if (typeof gtag === 'function') {
+          gtag('event', 'test_complete', {
+            'player_type': finalResult.type, // 记录最终玩家类型
+            'v_score': nextV,                // 记录最终入池倾向分
+            'a_score': nextA,                // 记录最终激进分
+            's_score': nextS                 // 记录最终粘性分
+          });
+        }
+        
+        // 4. 最后标记测试结束
         setFinished(true);
       }
       setActionAnim(null);
-    }, type ? 700 : 0); // 700ms delay if there's an animation, otherwise instant
-  };
+    }, type ? 700 : 0);
 
   const baseQuestion = questions[currentIndex];
   // If pro mode is on and there's a pro version, merge it in
@@ -530,6 +546,9 @@ export default function App() {
                   onClick={() => {
                     setProMode(true);
                     handleStart();
+                    if (typeof gtag === 'function') {
+                    gtag('event', 'start_test', { 'version': 'professional' });
+                    }
                   }}
                   className="flex flex-col items-center justify-center gap-4 bg-white border-2 border-slate-200 hover:border-indigo-600 hover:bg-indigo-50 text-slate-800 p-8 rounded-2xl transition-all shadow-sm hover:shadow-md active:scale-95 group"
                 >
@@ -546,6 +565,9 @@ export default function App() {
                   onClick={() => {
                     setProMode(false);
                     handleStart();
+                    if (typeof gtag === 'function') {
+                    gtag('event', 'start_test', { 'version': 'simple' });
+                    }
                   }}
                   className="flex flex-col items-center justify-center gap-4 bg-white border-2 border-slate-200 hover:border-emerald-600 hover:bg-emerald-50 text-slate-800 p-8 rounded-2xl transition-all shadow-sm hover:shadow-md active:scale-95 group"
                 >

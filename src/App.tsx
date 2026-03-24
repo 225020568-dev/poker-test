@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { Play, RotateCcw, CheckCircle2, User, Coins, Download, Copy, Check, Loader2, MapPin, Layers } from 'lucide-react';
+import { Play, RotateCcw, CheckCircle2, User, Coins, Download, Copy, Check, Loader2, MapPin, Layers, BrainCircuit, Coffee } from 'lucide-react';
 import { toPng } from 'html-to-image';
 
 // --- Audio Effect ---
@@ -161,35 +161,27 @@ const ScenarioVisualizer = ({ scenario, actionType }: { scenario: any, actionTyp
 const questions = [
   {
     id: 1,
-    question: "刚坐下还没摸清对手，你拿到 K♢10♡ (K10 杂色)，你会？",
+    question: "刚坐下还没摸清对手，拿到 K♦10♥ (K10o) 且前面没人加注，你会？",
     proDetails: { pot: 15, position: "UTG (枪口位)", stack: "1000" },
     options: [
-      { text: "A. 稳健起见，直接弃牌。", v: -2, a: 0, s: 0 },
-      { text: "B. 加注进入，拿下主动权。", v: 0, a: 2, s: 0 },
+      { text: "A. 稳健起见，直接弃牌。", v: -3, a: 0, s: 0 },
+      { text: "B. 加注进入，拿下主动权。", v: 1, a: 2, s: 0 },
       { text: "C. 跟着前面的平跟玩家一起 Limp 进去看牌。", v: 2, a: -1, s: 0 }
     ]
   },
   {
     id: 2,
-    question: "前面有 3 个人平跟（Limp）进池，你在大盲位拿着 5♠ 7♠（小同花连牌），你会？",
+    question: "底池有3个溜入者，你在大盲位持 5♠7♠。大家都在等你就位看翻牌，你会？",
     proDetails: { pot: 45, position: "BB (大盲位)", stack: "1000" },
     options: [
-      { text: "A. 难得进场便宜，肯定看看翻牌。", v: 2, a: -1, s: 0 },
-      { text: "B. 牌太烂，哪怕免费看牌也不想玩，直接弃牌。", v: -2, a: 0, s: 0 }
-    ],
-    proVersion: {
-      question: "前面 3 人平跟（Limp），你在大盲位（BB）持 5♠7♠。",
-      proDetails: { pot: 45, position: "BB (大盲位)", stack: "1000" },
-      options: [
-        { text: "A. 既然免费，直接过牌看翻牌，不中就放弃（Check-Fold）。", v: 1, a: -2, s: 0 },
-        { text: "B. 拒绝平庸，哪怕免费也不想在差位置纠缠，直接过牌后“一枪不接”。", v: -2, a: 0, s: 0 },
-        { text: "C. 尝试 Open 挤压（Squeeze）：大尺度加注到 60+，直接收池。", v: 1, a: 3, s: 0 }
-      ]
-    }
+      { text: "A. 过牌。免费看个翻牌，不中就扔（Check-Fold）。", v: 1, a: -2, s: 0 },
+      { text: "B. 弃牌。即便免费也不想纠缠，我拒绝在差位置玩烂牌。", v: -2, a: 0, s: 0 },
+      { text: "C. 加注挤压(Squeeze)！大尺度加注到60+，直接收走底池死钱。", v: 1, a: 3, s: 0 }
+    ]
   },
   {
     id: 3,
-    question: "你在翻牌中了顶对，但对手先下注了，你的第一反应是？",
+    question: "顶对面临 Lead Bet。你持 AQ 在 Q-7-2 牌面，对手抢先下注底池的 60%，你会？",
     proDetails: { pot: 100, position: "BTN (庄位)", stack: "800" },
     scenario: {
       hand: [{r:'A',s:'♠'}, {r:'Q',s:'♥'}],
@@ -199,29 +191,14 @@ const questions = [
       oppAction: "下注 60"
     },
     options: [
-      { text: "A. 马上加注（Raise），告诉他我也有牌。", v: 0, a: 2, s: 0 },
-      { text: "B. 先跟注（Call）看看，怕他有更大的。", v: 0, a: -2, s: 1 }
-    ],
-    proVersion: {
-      question: "底池 100，你翻前加注，对手领先下注（Lead Bet）60。",
-      proDetails: { pot: 100, position: "BTN (庄位)", stack: "800" },
-      scenario: {
-        hand: [{r:'A',s:'♠'}, {r:'Q',s:'♥'}],
-        board: [{r:'Q',s:'♦'}, {r:'7',s:'♣'}, {r:'2',s:'♠'}],
-        pot: 100,
-        invested: 40,
-        oppAction: "下注 60"
-      },
-      options: [
-        { text: "A. 马上加注（Raise）：牌面很干，直接反击拿价值并保护手牌。", v: 0, a: 2, s: 0 },
-        { text: "B. 只是跟注（Call）：我的牌已经很大且没有听牌威胁，留出空间让对手继续诈唬。", v: 0, a: 1, s: 1 },
-        { text: "C. 弃牌：对方下注 60% 底池很凶，怕他有 Q7 或三条。", v: 0, a: -2, s: -1 }
-      ]
-    }
+      { text: "A. 反推加注(Raise)！牌面很干，直接拿价值并封杀对手。", v: 0, a: 2, s: 0 },
+      { text: "B. 跟注(Call)。我的牌很稳，留出空间诱导对手继续诈唬。", v: 0, a: 1, s: 1 },
+      { text: "C. 弃牌。对方下注尺度极具压迫感，怕他有Q7或暗三。", v: 0, a: -2, s: -1 }
+    ]
   },
   {
     id: 4,
-    question: "你手持 K♠ J♠（翻前加注，只有 2 个高张），翻牌 7♣ 4♦ 2♥。你没中，对手下注底池的 1/3。",
+    question: "翻牌没中。持 KJ 面对 1/3 底池的“试探注”，你的真实选择是？",
     proDetails: { pot: 120, position: "CO (关位)", stack: "1200" },
     scenario: {
       hand: [{r:'K',s:'♠'}, {r:'J',s:'♠'}],
@@ -231,9 +208,9 @@ const questions = [
       oppAction: "下注 35"
     },
     options: [
-      { text: "A. 弃牌。没中就没胜率，没必要在干燥牌面浪费 1/3 的筹码。", v: 0, a: 0, s: -2 },
-      { text: "B. 浮动跟注 (Float)：利用赔率跟一注，打算在转牌对手示弱时通过位置优势偷下底池。", v: 0, a: 2, s: 1 },
-      { text: "C. 便宜跟注：反正注很小，万一转牌发个 K 或者 J我就反超了。", v: 0, a: -1, s: 2 }
+      { text: "A. 弃牌。没中就没道理跟，拒绝无效投入。", v: 0, a: 0, s: -2 },
+      { text: "B. 浮动跟注(Float)。利用赔率看一注，转牌他敢示弱我就偷。", v: 0, a: 2, s: 1 },
+      { text: "C. 跟注。注这么小，万一转牌发个 K 或 J 我就反超了。", v: 0, a: -1, s: 2 }
     ]
   },
   {
@@ -298,7 +275,7 @@ const questions = [
     },
     options: [
       { text: "A. 秒弃，没中就没道理跟。", v: 0, a: 0, s: -2 },
-      { text: "B. 我有 AK，这是大牌，我要搏一张 A 或 K。", v: 0, a: -1, s: 2 }
+      { text: "B. 我有 AK，这是大牌，我要搏一张 A 或 K。", v: 1, a: -1, s: 2 }
     ],
     proVersion: {
       question: "底池 150，对方突然超额全进 800。",
@@ -311,9 +288,9 @@ const questions = [
         oppAction: "全进 (All-in) 800"
       },
       options: [
-        { text: "A. 看赔率：如果对手推的尺度合理（如平池），我会接；推 5 倍底池必弃。", v: 0, a: 0, s: -1 },
-        { text: "B. 不管赔率：我有 AK 这种顶级大牌，一定要搏一张 A 或 K 出来。", v: 1, a: 0, s: 3 },
-        { text: "C. 机械弃牌：没中对子就不接全进，哪怕对手可能在诈唬。", v: -1, a: -1, s: -2 }
+        { text: "A. 弃牌。800 对 150 是严重的超池溢价，底池赔率完全不支持我用 AK 高牌去搏命。", v: 0, a: 0, s: -2 },
+        { text: "B. 跟注。我不信他有牌，AK 已经很大了，我不能在这种大底池里被他偷走。", v: 1, a: 0, s: 3 },
+        { text: "C. 弃牌。没中对子就不接全进，这是我的打牌纪律，跟赔率无关。", v: -1, a: -1, s: -1 }
       ]
     }
   },
@@ -328,7 +305,7 @@ const questions = [
   },
   {
     id: 10,
-    question: "当你加注后被对手再加注（3-bet），你通常会？",
+    question: "88 加注到 40，对手 3-bet 你到 140。他后手仅剩 300。",
     proDetails: { pot: 180, position: "UTG+1", stack: "2000" },
     scenario: {
       hand: [{r:'8',s:'♣'}, {r:'8',s:'♦'}],
@@ -336,44 +313,33 @@ const questions = [
       pot: 180,
       invested: 40,
       oppAction: "再加注到 140",
-      note: "对手是一个很稳的玩家，他突然对你 3-bet"
+      note: "对手后手仅剩 300"
     },
     options: [
-      { text: "A. 我会跟注博中三条机会。", v: 1, a: -1, s: 2 },
-      { text: "B. 如果手里的牌不是顶级的，就果断弃牌。", v: -1, a: 0, s: -2 }
-    ],
-    proVersion: {
-      question: "你加注到 40，稳健对手 3-bet 你到 140。",
-      proDetails: { pot: 180, position: "UTG+1", stack: "2000" },
-      scenario: {
-        hand: [{r:'8',s:'♣'}, {r:'8',s:'♦'}],
-        board: [],
-        pot: 180,
-        invested: 40,
-        oppAction: "再加注到 140",
-        note: "对手是一个很稳的玩家，他突然对你 3-bet"
-      },
-      options: [
-        { text: "A. 看筹码深度：如果后手还有 2000+，我会跟注博 1/12 的中三条机会。", v: 1, a: 0, s: 1 },
-        { text: "B. 看赔率：对方后手所剩无几（如只剩 300），博三条不划算，直接弃牌。", v: -2, a: 0, s: -1 },
-        { text: "C. 已经投了 40，不想白白损失，硬着头皮也要再跟 100 看看。", v: 2, a: -1, s: 2 }
-      ]
-    }
+      { text: "A. 弃牌。对方后手已不足，博三条的隐含赔率完全不划算。", v: -2, a: 0, s: -2 },
+      { text: "B. 跟注。既然已经投了 40，硬着头皮也要再跟 100。", v: 2, a: -1, s: 2 },
+      { text: "C. 全进 (All-in)！既然他筹码不多了，我直接反推给他施加压力。", v: 1, a: 3, s: 0 }
+    ]
   }
 ];
 
 const getResult = (v: number, a: number, s: number) => {
-  if (v >= 0) { // Loose
-    if (a >= 0) { // Aggressive
+  // 定义一个中性区间，防止轻微的偏差导致分类突变
+  const threshold = 2; 
+
+  // 分支 1: 松 (Loose)
+  if (v > threshold) { 
+    if (a > threshold) {
       return {
         type: "🔥 松凶 (LAG)",
         vpip: "VPIP 25~35%",
         desc: "宽范围 + 高频施压，难以读牌",
         color: "text-red-500",
         bg: "bg-red-50"
-      };
-    } else { // Passive
-      if (s >= 3) {
+      }; // 典型的狂野选手
+    } else {
+      // 在松的象限里，靠 S (粘性) 区分鱼和松弱
+      if (s >= 4) { // 提高鱼的阈值，必须足够粘才是鱼
         return {
           type: "🐟 鱼 / 跟注站",
           vpip: "VPIP >45%",
@@ -381,34 +347,45 @@ const getResult = (v: number, a: number, s: number) => {
           color: "text-blue-500",
           bg: "bg-blue-50"
         };
-      } else {
-        return {
-          type: "🌀 松弱 (LP)",
-          vpip: "VPIP 30~45%",
-          desc: "入池多，但翻后被动，容易被诈唬或盲目跟注",
-          color: "text-indigo-500",
-          bg: "bg-indigo-50"
-        };
       }
+      return {
+        type: "🌀 松弱 (LP)",
+        vpip: "VPIP 30~45%",
+        desc: "入池多，但翻后被动，容易被诈唬或盲目跟注",
+        color: "text-indigo-500",
+        bg: "bg-indigo-50"
+      };
     }
-  } else { // Tight
-    if (a >= 0) { // Aggressive
+  } 
+  // 分支 2: 紧 (Tight)
+  else if (v < -threshold) {
+    if (a > 0) {
       return {
         type: "⚔️ 紧凶 (TAG)",
         vpip: "VPIP 15~22%",
         desc: "紧的范围 + 激进的加注/诈唬",
         color: "text-amber-500",
         bg: "bg-amber-50"
-      };
-    } else { // Passive
-      return {
-        type: "⛰️ 岩石 (Rock)",
-        vpip: "VPIP ≤15%",
-        desc: "极紧，只玩顶级牌，极少诈唬",
-        color: "text-emerald-600",
-        bg: "bg-emerald-50"
-      };
+      }; // 职业选手/鲨鱼
     }
+    return {
+      type: "⛰️ 岩石 (Rock)",
+      vpip: "VPIP ≤15%",
+      desc: "极紧，只玩顶级牌，极少诈唬",
+      color: "text-emerald-600",
+      bg: "bg-emerald-50"
+    }; // 极端保守
+  }
+  // 分支 3: 标准/平衡型 (Balanced)
+  else {
+    // 如果 V 分数在 [-2, 2] 之间，说明玩得很平衡
+    return {
+      type: "⚖️ 均衡型 (Balanced)",
+      vpip: "VPIP 20~25%",
+      desc: "起手牌选择合理，不极端。具备进阶牌手的基本素质。",
+      color: "text-blue-600",
+      bg: "bg-blue-50"
+    };
   }
 };
 
@@ -519,15 +496,17 @@ export default function App() {
           </div>
           德扑玩家类型测试
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm font-medium text-slate-500">简单模式</span>
-          <button
-            onClick={() => setProMode(!proMode)}
-            className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${!proMode ? 'bg-indigo-600' : 'bg-slate-300'}`}
-          >
-            <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${!proMode ? 'translate-x-6' : 'translate-x-1'}`} />
-          </button>
-        </div>
+        {started && !finished && (
+          <div className="flex items-center gap-3">
+            <span className="text-sm font-medium text-slate-500">简单模式</span>
+            <button
+              onClick={() => setProMode(!proMode)}
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${!proMode ? 'bg-indigo-600' : 'bg-slate-300'}`}
+            >
+              <span className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${!proMode ? 'translate-x-6' : 'translate-x-1'}`} />
+            </button>
+          </div>
+        )}
       </header>
 
       <main className="flex-1 w-full max-w-3xl mx-auto p-4 sm:p-6 flex flex-col justify-center">
@@ -546,16 +525,39 @@ export default function App() {
               <p className="text-slate-500 mb-8 text-lg leading-relaxed max-w-xl mx-auto">
                 只需 10 道题，基于 VPIP（入池率）、Aggression（激进程度）和 Stickiness（粘性）三个维度，精准测出你的牌桌风格。
               </p>
-              <div className="bg-slate-50 border border-slate-200 rounded-xl p-4 mb-8 max-w-md mx-auto text-sm text-slate-600 text-left">
-                <span className="font-semibold text-slate-700">💡 提示：</span>默认专业模式题目包含“底池数据”、“位置标注”和“筹码深度”。如需更直观的体验，可在右上角开启“简单模式”。
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-2xl mx-auto">
+                <button
+                  onClick={() => {
+                    setProMode(true);
+                    handleStart();
+                  }}
+                  className="flex flex-col items-center justify-center gap-4 bg-white border-2 border-slate-200 hover:border-indigo-600 hover:bg-indigo-50 text-slate-800 p-8 rounded-2xl transition-all shadow-sm hover:shadow-md active:scale-95 group"
+                >
+                  <div className="w-16 h-16 bg-indigo-100 text-indigo-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <BrainCircuit className="w-8 h-8" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-xl mb-2 text-slate-900 group-hover:text-indigo-700">专业模式</div>
+                    <div className="text-sm text-slate-500 leading-relaxed">包含底池、位置和筹码深度等详细数据，适合有经验的玩家</div>
+                  </div>
+                </button>
+
+                <button
+                  onClick={() => {
+                    setProMode(false);
+                    handleStart();
+                  }}
+                  className="flex flex-col items-center justify-center gap-4 bg-white border-2 border-slate-200 hover:border-emerald-600 hover:bg-emerald-50 text-slate-800 p-8 rounded-2xl transition-all shadow-sm hover:shadow-md active:scale-95 group"
+                >
+                  <div className="w-16 h-16 bg-emerald-100 text-emerald-600 rounded-full flex items-center justify-center group-hover:scale-110 transition-transform">
+                    <Coffee className="w-8 h-8" />
+                  </div>
+                  <div className="text-center">
+                    <div className="font-bold text-xl mb-2 text-slate-900 group-hover:text-emerald-700">简单模式</div>
+                    <div className="text-sm text-slate-500 leading-relaxed">更直观的场景描述，无需计算赔率，适合快速测试</div>
+                  </div>
+                </button>
               </div>
-              <button
-                onClick={handleStart}
-                className="inline-flex items-center justify-center gap-2 bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-4 rounded-full font-medium text-lg transition-all shadow-sm hover:shadow-md active:scale-95"
-              >
-                <Play className="w-5 h-5 fill-current" />
-                开始测试
-              </button>
             </motion.div>
           ) : !finished ? (
             <motion.div
@@ -594,7 +596,7 @@ export default function App() {
                     </div>
                     <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-slate-100 text-slate-600 text-sm font-medium">
                       <Layers className="w-4 h-4 text-amber-600" />
-                      深度: {currentQuestion.proDetails.stack}
+                      你的筹码量: {currentQuestion.proDetails.stack}
                     </div>
                   </div>
                 )}
